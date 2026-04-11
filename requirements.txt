@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+pillow
+torch
+torchvision
+python-multipart
+requests
+groq
+python-dotenv
+fastapi-cors
+transformers
