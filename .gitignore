@@ -35,11 +35,8 @@ ENV/
 env/
 .virtualenv/
 
-# PyTorch Models (too large for GitHub)
-*.pth
-*.pt
-models/*.pth
-models/*.pt
+# PyTorch Models are tracked with Git LFS
+# See .gitattributes for LFS configuration
 
 # IDEs
 .vscode/
