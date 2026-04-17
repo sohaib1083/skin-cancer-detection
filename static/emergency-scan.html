@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emergency Scan - SkinScan AI</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .image-preview { position: relative; border: 2px solid #e5e7eb; border-radius: 0.75rem; overflow: hidden; }
+    .image-preview img { width: 100%; max-height: 24rem; object-fit: contain; }
+    .retake-btn { position: absolute; top: 1rem; right: 1rem; background: #ef4444; color: #fff; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; border: none; }
+    .retake-btn:hover { background: #dc2626; }
+    .upload-area-emergency { border-color: #fca5a5; }
+    .upload-area-emergency:hover { border-color: #ef4444; background-color: #fef2f2; }
+  </style>
+</head>
+<body>
+  <div class="page-with-sidebar" style="background:#f9fafb;">
+    <!-- Sidebar -->
+    <aside class="sidebar" style="box-shadow:0 10px 15px rgba(0,0,0,0.1);">
+      <div class="sidebar-header" style="border-bottom:1px solid #e5e7eb;">
+        <h2 style="color:#4f46e5;">Skin Scan AI</h2>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="sidebar-nav-item">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </a>
+        <div class="sidebar-section-title">Classification Types</div>
+        <a href="classification-scan.html?type=melanoma" class="sidebar-nav-item"><span class="nav-emoji">1️⃣</span><span class="nav-text-sm">Melanoma</span></a>
+        <a href="classification-scan.html?type=basal-cell" class="sidebar-nav-item"><span class="nav-emoji">2️⃣</span><span class="nav-text-sm">Basal Cell Carcinoma (BCC)</span></a>
+        <a href="classification-scan.html?type=squamous-cell" class="sidebar-nav-item"><span class="nav-emoji">3️⃣</span><span class="nav-text-sm">Squamous Cell Carcinoma (SCC)</span></a>
+        <a href="classification-scan.html?type=actinic-keratosis" class="sidebar-nav-item"><span class="nav-emoji">4️⃣</span><span class="nav-text-sm">Actinic Keratosis</span></a>
+        <a href="classification-scan.html?type=benign-keratosis" class="sidebar-nav-item"><span class="nav-emoji">5️⃣</span><span class="nav-text-sm">Benign Keratosis</span></a>
+        <a href="classification-scan.html?type=dermatofibroma" class="sidebar-nav-item"><span class="nav-emoji">6️⃣</span><span class="nav-text-sm">Dermatofibroma</span></a>
+        <a href="classification-scan.html?type=vascular-lesions" class="sidebar-nav-item"><span class="nav-emoji">7️⃣</span><span class="nav-text-sm">Vascular Lesions</span></a>
+        <div style="padding-top:1rem;">
+          <a href="patient-history.html" class="sidebar-nav-item">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            History
+          </a>
+        </div>
+        <a href="login.html" class="sidebar-nav-item danger">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Logout
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main style="flex:1; padding:2rem;">
+      <a href="dashboard.html" class="back-btn">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Back to Dashboard
+      </a>
+
+      <div style="max-width:56rem; margin:0 auto;">
+        <!-- Header -->
+        <div style="text-align:center; margin-bottom:2rem;">
+          <div style="width:5rem; height:5rem; background:linear-gradient(135deg,#ef4444,#dc2626); border-radius:9999px; display:flex; align-items:center; justify-content:center; margin:0 auto 1rem; color:#fff; font-size:1.875rem;">⚡</div>
+          <h1 style="color:#111827; margin-bottom:0.5rem;">Emergency / One-Time Scan</h1>
+          <p style="color:#4b5563;">Quick analysis for immediate results</p>
+        </div>
+
+        <!-- Warning Banner -->
+        <div class="alert alert-red" style="margin-bottom:2rem;">
+          <div style="display:flex; align-items:flex-start; gap:1rem;">
+            <svg width="24" height="24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" style="flex-shrink:0; margin-top:0.25rem;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <div>
+              <h3 style="color:#7f1d1d; margin-bottom:0.5rem;">📌 Emergency Scan Only</h3>
+              <p style="color:#b91c1c;">This is a one-time emergency scan. Results will not be saved to patient history. For record keeping, please use the regular "New Skin Scan" feature.</p>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:#fff; border-radius:0.75rem; box-shadow:0 10px 15px rgba(0,0,0,0.1); padding:2rem;">
+          <div>
+            <h2 style="color:#111827; margin-bottom:1rem;">Live Camera Capture</h2>
+
+            <div id="uploadSection">
+              <!-- Capture button -->
+              <div class="upload-area upload-area-emergency" style="padding:3rem; margin-bottom:1rem; border-color:#fca5a5;" onclick="handleCapture()">
+                <svg width="64" height="64" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" style="margin:0 auto 1rem;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                <p style="color:#111827; margin-bottom:0.5rem; font-weight:500;">Capture Image</p>
+                <p style="color:#4b5563;">Use camera for immediate capture</p>
+              </div>
+
+              <!-- Alternative upload -->
+              <div style="text-align:center;">
+                <p style="color:#6b7280; margin-bottom:0.75rem;">Or upload from device</p>
+                <button onclick="document.getElementById('fileInput').click()" style="color:#4f46e5; text-decoration:underline; background:none; border:none; cursor:pointer;">Upload from folder</button>
+                <input id="fileInput" type="file" accept="image/*" style="display:none;" onchange="handleFileSelect(event)">
+              </div>
+            </div>
+
+            <div id="previewSection" style="display:none;">
+              <div class="image-preview">
+                <img id="previewImage" src="" alt="Emergency scan">
+                <button class="retake-btn" onclick="removeImage()">Retake</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Analyze -->
+          <button id="analyzeBtn" onclick="handleQuickAnalyze()" class="btn btn-red w-full" style="margin-top:1.5rem; padding:1rem;" disabled>
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Quick Analyze
+          </button>
+
+          <!-- Info Note -->
+          <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:0.5rem; padding:1rem; margin-top:1.5rem;">
+            <p style="color:#374151;"><strong>Note:</strong> After viewing the result, you will be redirected back to the dashboard. No data will be saved.</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    let selectedFile = null;
+
+    function handleFileSelect(e) {
+      const file = e.target.files[0];
+      if (file) {
+        selectedFile = file;
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+          document.getElementById('previewImage').src = ev.target.result;
+          document.getElementById('uploadSection').style.display = 'none';
+          document.getElementById('previewSection').style.display = 'block';
+          document.getElementById('analyzeBtn').disabled = false;
+          document.getElementById('analyzeBtn').style.opacity = '1';
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function handleCapture() {
+      alert('Camera feature would be implemented here using navigator.mediaDevices.getUserMedia()');
+    }
+
+    function removeImage() {
+      selectedFile = null;
+      document.getElementById('uploadSection').style.display = 'block';
+      document.getElementById('previewSection').style.display = 'none';
+      document.getElementById('analyzeBtn').disabled = true;
+      document.getElementById('analyzeBtn').style.opacity = '0.5';
+      document.getElementById('fileInput').value = '';
+    }
+
+    async function handleQuickAnalyze() {
+      if (!selectedFile) {
+        alert('Please capture or upload an image first');
+        return;
+      }
+
+      const btn = document.getElementById('analyzeBtn');
+      btn.disabled = true;
+      btn.innerHTML = '⏳ Analyzing...';
+
+      const reader = new FileReader();
+      reader.onload = async function(ev) {
+        localStorage.setItem('scanImagePreview', ev.target.result);
+        localStorage.setItem('patientId',   'EMERGENCY');
+        localStorage.setItem('patientName', 'Emergency Patient');
+        localStorage.setItem('patientAge',  'N/A');
+        localStorage.setItem('scanDate',    new Date().toLocaleDateString());
+        localStorage.setItem('isEmergency', 'true');
+
+        try {
+          const formData = new FormData();
+          formData.append('file', selectedFile);
+          const response = await fetch('http://localhost:8000/predict', {
+            method: 'POST',
+            body: formData
+          });
+          if (!response.ok) throw new Error('Server error: ' + response.status);
+          const data = await response.json();
+          localStorage.setItem('scanResult', JSON.stringify(data));
+          window.location.href = 'diagnosis-result.html?emergency=true';
+        } catch (err) {
+          btn.disabled = false;
+          btn.innerHTML = '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Quick Analyze';
+          btn.style.opacity = '1';
+          alert('Error: ' + err.message + '\nMake sure the backend server is running.');
+        }
+      };
+      reader.readAsDataURL(selectedFile);
+    }
+  </script>
+</body>
+</html>

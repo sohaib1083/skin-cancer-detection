@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Diagnosis Result - SkinScan AI</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .result-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-bottom: 1.5rem; }
+    .result-card { border: 2px solid #e5e7eb; border-radius: 0.75rem; padding: 1.5rem; text-align: center; }
+    .result-label { color: #4b5563; margin-bottom: 0.5rem; }
+    .result-value { color: #111827; font-size: 1.25rem; font-weight: 600; }
+    .risk-low { border-color: #86efac; background: #f0fdf4; }
+    .risk-moderate { border-color: #fed7aa; background: #fff7ed; }
+    .risk-high { border-color: #fecaca; background: #fef2f2; }
+  </style>
+</head>
+<body>
+  <div class="page-with-sidebar gradient-bg-gray-indigo">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header-gradient">
+        <div style="display:flex; align-items:center; gap:0.75rem;">
+          <div style="width:2.5rem; height:2.5rem; background:#fff; border-radius:0.75rem; display:flex; align-items:center; justify-content:center;">
+            <svg width="24" height="24" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <h2 style="color:#fff; font-size:1.125rem;">SkinScan AI</h2>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="sidebar-nav-item">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </a>
+        <div class="sidebar-section-title">Classification Types</div>
+        <a href="classification-scan.html?type=melanoma" class="sidebar-nav-item"><span class="nav-emoji">1️⃣</span><span class="nav-text-sm">Melanoma</span></a>
+        <a href="classification-scan.html?type=basal-cell" class="sidebar-nav-item"><span class="nav-emoji">2️⃣</span><span class="nav-text-sm">Basal Cell Carcinoma (BCC)</span></a>
+        <a href="classification-scan.html?type=squamous-cell" class="sidebar-nav-item"><span class="nav-emoji">3️⃣</span><span class="nav-text-sm">Squamous Cell Carcinoma (SCC)</span></a>
+        <a href="classification-scan.html?type=actinic-keratosis" class="sidebar-nav-item"><span class="nav-emoji">4️⃣</span><span class="nav-text-sm">Actinic Keratosis</span></a>
+        <a href="classification-scan.html?type=benign-keratosis" class="sidebar-nav-item"><span class="nav-emoji">5️⃣</span><span class="nav-text-sm">Benign Keratosis</span></a>
+        <a href="classification-scan.html?type=dermatofibroma" class="sidebar-nav-item"><span class="nav-emoji">6️⃣</span><span class="nav-text-sm">Dermatofibroma</span></a>
+        <a href="classification-scan.html?type=vascular-lesions" class="sidebar-nav-item"><span class="nav-emoji">7️⃣</span><span class="nav-text-sm">Vascular Lesions</span></a>
+        <div style="padding-top:1rem;">
+          <a href="patient-history.html" class="sidebar-nav-item">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            History
+          </a>
+        </div>
+        <a href="login.html" class="sidebar-nav-item danger">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Logout
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main style="flex:1; padding:2rem;">
+      <a href="javascript:history.back()" class="back-btn">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Back
+      </a>
+
+      <div style="max-width:64rem; margin:0 auto;">
+        <!-- Header -->
+        <div style="text-align:center; margin-bottom:2rem;">
+          <h1 style="color:#111827; margin-bottom:0.5rem;">AI Diagnosis Result</h1>
+          <div id="emergencyBadge" style="display:none; margin-top:0.5rem;">
+            <span style="display:inline-block; background:#fee2e2; color:#991b1b; padding:0.5rem 1rem; border-radius:9999px;">⚡ Emergency Scan - Not Saved</span>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" style="background:#fff; border-radius:0.75rem; box-shadow:0 10px 15px rgba(0,0,0,0.1); padding:3rem; text-align:center;">
+          <div class="spinner"></div>
+          <h2 style="color:#111827; margin-bottom:0.5rem;">Analyzing Image...</h2>
+          <p style="color:#4b5563;">AI is processing the skin lesion image</p>
+        </div>
+
+        <!-- Results (hidden initially) -->
+        <div id="resultsState" style="display:none;">
+          <!-- Image and Patient Info -->
+          <div class="grid md-grid-2" style="gap:1.5rem; margin-bottom:1.5rem;">
+            <!-- Image Preview -->
+            <div style="background:#fff; border-radius:0.75rem; box-shadow:0 10px 15px rgba(0,0,0,0.1); overflow:hidden;">
+              <div style="padding:1rem; border-bottom:1px solid #e5e7eb;">
+                <h3 style="color:#111827;">Uploaded Image</h3>
+              </div>
+              <div style="padding:1rem;">
+                <div style="width:100%; height:20rem; background:#f9fafb; border-radius:0.5rem; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+                  <img id="previewImg" src="" alt="Scan image" style="max-width:100%; max-height:100%; object-fit:contain; display:none;">
+                  <svg id="previewPlaceholder" width="64" height="64" fill="none" stroke="#d1d5db" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- Patient Information -->
+            <div id="patientInfoCard" style="background:#fff; border-radius:0.75rem; box-shadow:0 10px 15px rgba(0,0,0,0.1); padding:1.5rem;">
+              <h3 style="color:#111827; margin-bottom:1rem;">Patient Information</h3>
+              <div style="display:flex; flex-direction:column; gap:0.75rem;">
+                <div style="display:flex; justify-content:space-between; padding:0.5rem 0; border-bottom:1px solid #f3f4f6;">
+                  <span style="color:#4b5563;">Patient ID:</span>
+                  <span id="infoPatientId" style="color:#111827; font-weight:500;"></span>
+                </div>
+                <div style="display:flex; justify-content:space-between; padding:0.5rem 0; border-bottom:1px solid #f3f4f6;">
+                  <span style="color:#4b5563;">Name:</span>
+                  <span id="infoPatientName" style="color:#111827; font-weight:500;"></span>
+                </div>
+                <div style="display:flex; justify-content:space-between; padding:0.5rem 0; border-bottom:1px solid #f3f4f6;">
+                  <span style="color:#4b5563;">Age:</span>
+                  <span id="infoPatientAge" style="color:#111827; font-weight:500;"></span>
+                </div>
+                <div style="display:flex; justify-content:space-between; padding:0.5rem 0;">
+                  <span style="color:#4b5563;">Scan Date:</span>
+                  <span id="infoScanDate" style="color:#111827; font-weight:500;"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Detection Results -->
+          <div style="background:#fff; border-radius:0.75rem; box-shadow:0 10px 15px rgba(0,0,0,0.1); padding:2rem; margin-bottom:1.5rem;">
+            <h2 style="color:#111827; margin-bottom:1.5rem;">Detection Results</h2>
+
+            <div class="result-grid">
+              <div class="result-card">
+                <p class="result-label">Diagnosis</p>
+                <p id="resultDiagnosis" class="result-value"></p>
+              </div>
+              <div class="result-card">
+                <p class="result-label">Type</p>
+                <p id="resultType" class="result-value"></p>
+              </div>
+              <div class="result-card">
+                <p class="result-label">Confidence</p>
+                <p id="resultConfidence" class="result-value"></p>
+                <div class="confidence-bar-bg">
+                  <div id="confidenceBar" class="confidence-bar-fill" style="width:0%;"></div>
+                </div>
+              </div>
+              <div id="riskCard" class="result-card">
+                <p class="result-label">Risk Level</p>
+                <div style="display:flex; align-items:center; justify-content:center; gap:0.5rem;">
+                  <span id="riskIcon" style="font-size:1.5rem;"></span>
+                  <span id="resultRisk" style="font-size:1.25rem; font-weight:600;"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- AI Prevention & Recommendations -->
+            <div style="background:#f9fafb; border-radius:0.5rem; padding:1.5rem; margin-top:1rem;">
+              <h3 style="color:#111827; margin-bottom:1rem;">💡 AI Recommendations & Prevention Steps</h3>
+              <p id="resultPreventionSteps" style="color:#374151; white-space:pre-line; line-height:1.6;"></p>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div style="display:flex; gap:1rem;">
+            <a id="reportBtn" href="medical-report.html" class="btn btn-indigo flex-1" style="text-align:center; padding:1rem;">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              Generate Medical Report
+            </a>
+            <a id="exitBtn" href="dashboard.html" class="btn btn-gray flex-1" style="text-align:center; padding:1rem; display:none;">
+              Exit to Dashboard
+            </a>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Read from localStorage
+    var result     = JSON.parse(localStorage.getItem('scanResult') || 'null');
+    var imgPreview = localStorage.getItem('scanImagePreview') || '';
+    var patientId   = localStorage.getItem('patientId')   || 'N/A';
+    var patientName = localStorage.getItem('patientName') || 'N/A';
+    var patientAge  = localStorage.getItem('patientAge')  || 'N/A';
+    var scanDate    = localStorage.getItem('scanDate')    || new Date().toLocaleDateString();
+    var isEmergency = localStorage.getItem('isEmergency') === 'true';
+
+    // Check if emergency (also from URL param for backwards compat)
+    var params = new URLSearchParams(window.location.search);
+    if (params.get('emergency') === 'true') isEmergency = true;
+
+    if (isEmergency) {
+      document.getElementById('emergencyBadge').style.display = 'block';
+      document.getElementById('patientInfoCard').style.display = 'none';
+      document.getElementById('reportBtn').style.display = 'none';
+      document.getElementById('exitBtn').style.display = 'flex';
+    }
+
+    // Simulate loading then show results
+    setTimeout(function() {
+      document.getElementById('loadingState').style.display = 'none';
+
+      if (!result) {
+        document.getElementById('resultsState').innerHTML =
+          '<div style="background:#fff;border-radius:0.75rem;padding:3rem;text-align:center;">' +
+          '<p style="color:#dc2626;font-size:1.25rem;">⚠️ No result data found. Please go back and analyze an image first.</p>' +
+          '<a href="new-scan.html" class="btn btn-indigo" style="margin-top:1rem;display:inline-block;">Start New Scan</a>' +
+          '</div>';
+        document.getElementById('resultsState').style.display = 'block';
+        return;
+      }
+
+      // Populate patient info
+      document.getElementById('infoPatientId').textContent   = patientId;
+      document.getElementById('infoPatientName').textContent = patientName;
+      document.getElementById('infoPatientAge').textContent  = patientAge !== 'N/A' ? patientAge + ' years' : 'N/A';
+      document.getElementById('infoScanDate').textContent    = scanDate;
+
+      // Populate image preview
+      if (imgPreview) {
+        var img = document.getElementById('previewImg');
+        img.src = imgPreview;
+        img.style.display = 'block';
+        document.getElementById('previewPlaceholder').style.display = 'none';
+      }
+
+      // Populate detection results
+      document.getElementById('resultDiagnosis').textContent   = result.is_malignant ? 'Malignant' : 'Benign';
+      document.getElementById('resultType').textContent        = result.class_name;
+      document.getElementById('resultConfidence').textContent  = result.confidence + '%';
+      document.getElementById('confidenceBar').style.width     = result.confidence + '%';
+      document.getElementById('resultPreventionSteps').textContent = result.prevention_steps;
+
+      // Risk level styling
+      var riskCard  = document.getElementById('riskCard');
+      var riskEl    = document.getElementById('resultRisk');
+      var riskIcon  = document.getElementById('riskIcon');
+      riskEl.textContent = result.risk_level;
+
+      var diagEl = document.getElementById('resultDiagnosis');
+      if (result.risk_level === 'High') {
+        riskCard.classList.add('risk-high');
+        riskEl.style.color = '#991b1b';
+        riskIcon.textContent = '⚠️';
+        diagEl.style.color = '#dc2626';
+      } else if (result.risk_level === 'Moderate') {
+        riskCard.classList.add('risk-moderate');
+        riskEl.style.color = '#9a3412';
+        riskIcon.textContent = '⚡';
+        diagEl.style.color = '#ea580c';
+      } else {
+        riskCard.classList.add('risk-low');
+        riskEl.style.color = '#166534';
+        riskIcon.textContent = '✅';
+        diagEl.style.color = '#16a34a';
+      }
+
+      document.getElementById('resultsState').style.display = 'block';
+    }, 1800);
+  </script>
+</body>
+</html>

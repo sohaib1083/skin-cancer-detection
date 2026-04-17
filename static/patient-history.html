@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patient History - SkinScan AI</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .filter-bar { display:flex; gap:1rem; margin-bottom:1.5rem; flex-wrap:wrap; align-items:flex-end; }
+    .filter-group { display:flex; flex-direction:column; gap:0.25rem; }
+    .filter-group label { font-size:0.875rem; color:#4b5563; font-weight:500; }
+    .filter-input { padding:0.5rem 0.75rem; border:1px solid #d1d5db; border-radius:0.5rem; font-size:0.875rem; }
+    .data-table { width:100%; border-collapse:collapse; }
+    .data-table th { background:#f9fafb; color:#4b5563; font-weight:600; text-align:left; padding:0.75rem 1rem; border-bottom:2px solid #e5e7eb; font-size:0.875rem; }
+    .data-table td { padding:0.75rem 1rem; border-bottom:1px solid #f3f4f6; color:#374151; font-size:0.875rem; }
+    .data-table tr:hover { background:#f9fafb; }
+    .badge { display:inline-block; padding:0.25rem 0.75rem; border-radius:9999px; font-size:0.75rem; font-weight:600; }
+    .badge-low { background:#dcfce7; color:#166534; }
+    .badge-moderate { background:#ffedd5; color:#9a3412; }
+    .badge-high { background:#fee2e2; color:#991b1b; }
+    .stat-mini { background:#fff; border-radius:0.75rem; padding:1.25rem; box-shadow:0 1px 3px rgba(0,0,0,0.1); text-align:center; }
+    .stat-mini-value { font-size:1.5rem; font-weight:700; color:#111827; }
+    .stat-mini-label { font-size:0.875rem; color:#4b5563; }
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:100; display:flex; align-items:center; justify-content:center; padding:2rem; }
+    .modal-content { background:#fff; border-radius:1rem; box-shadow:0 25px 50px rgba(0,0,0,0.25); max-width:40rem; width:100%; max-height:90vh; overflow-y:auto; }
+    .modal-header { padding:1.5rem; border-bottom:1px solid #e5e7eb; display:flex; align-items:center; justify-content:space-between; }
+    .modal-body { padding:1.5rem; }
+    .detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.5rem; }
+    .detail-item { display:flex; flex-direction:column; gap:0.125rem; }
+    .detail-label { font-size:0.75rem; color:#4b5563; text-transform:uppercase; letter-spacing:0.05em; }
+    .detail-value { color:#111827; font-weight:500; }
+    .btn-view { background:#eef2ff; color:#4f46e5; border:none; padding:0.375rem 0.75rem; border-radius:0.375rem; font-size:0.8125rem; font-weight:500; cursor:pointer; }
+    .btn-view:hover { background:#e0e7ff; }
+    .hidden { display:none !important; }
+    @media (max-width:768px) { .data-table { display:block; overflow-x:auto; } .detail-grid { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <div class="page-with-sidebar gradient-bg-gray-indigo">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header-gradient">
+        <div style="display:flex; align-items:center; gap:0.75rem;">
+          <div style="width:2.5rem; height:2.5rem; background:#fff; border-radius:0.75rem; display:flex; align-items:center; justify-content:center;">
+            <svg width="24" height="24" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <h2 style="color:#fff; font-size:1.125rem;">SkinScan AI</h2>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="sidebar-nav-item">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </a>
+        <div class="sidebar-section-title">Classification Types</div>
+        <a href="classification-scan.html?type=melanoma" class="sidebar-nav-item"><span class="nav-emoji">1️⃣</span><span class="nav-text-sm">Melanoma</span></a>
+        <a href="classification-scan.html?type=basal-cell" class="sidebar-nav-item"><span class="nav-emoji">2️⃣</span><span class="nav-text-sm">Basal Cell Carcinoma (BCC)</span></a>
+        <a href="classification-scan.html?type=squamous-cell" class="sidebar-nav-item"><span class="nav-emoji">3️⃣</span><span class="nav-text-sm">Squamous Cell Carcinoma (SCC)</span></a>
+        <a href="classification-scan.html?type=actinic-keratosis" class="sidebar-nav-item"><span class="nav-emoji">4️⃣</span><span class="nav-text-sm">Actinic Keratosis</span></a>
+        <a href="classification-scan.html?type=benign-keratosis" class="sidebar-nav-item"><span class="nav-emoji">5️⃣</span><span class="nav-text-sm">Benign Keratosis</span></a>
+        <a href="classification-scan.html?type=dermatofibroma" class="sidebar-nav-item"><span class="nav-emoji">6️⃣</span><span class="nav-text-sm">Dermatofibroma</span></a>
+        <a href="classification-scan.html?type=vascular-lesions" class="sidebar-nav-item"><span class="nav-emoji">7️⃣</span><span class="nav-text-sm">Vascular Lesions</span></a>
+        <div style="padding-top:1rem;">
+          <a href="patient-history.html" class="sidebar-nav-item active">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            History
+          </a>
+        </div>
+        <a href="login.html" class="sidebar-nav-item danger">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Logout
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main style="flex:1; padding:2rem; overflow-y:auto;">
+      <!-- Page Header -->
+      <div style="margin-bottom:2rem;">
+        <h1 style="color:#111827; margin-bottom:0.5rem; display:flex; align-items:center; gap:0.75rem;">
+          <svg width="28" height="28" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Patient History
+        </h1>
+        <p style="color:#4b5563;">View and search past scan records</p>
+      </div>
+
+      <!-- Search / Filter -->
+      <div style="background:#fff; border-radius:0.75rem; box-shadow:0 1px 3px rgba(0,0,0,0.1); padding:1.5rem; margin-bottom:1.5rem;">
+        <div class="filter-bar">
+          <div class="filter-group">
+            <label for="dateFilter">Date</label>
+            <input type="date" id="dateFilter" class="filter-input">
+          </div>
+          <div class="filter-group" style="flex:1; min-width:12rem;">
+            <label for="patientFilter">Patient ID</label>
+            <input type="text" id="patientFilter" class="filter-input" placeholder="Search by patient ID...">
+          </div>
+          <button id="clearBtn" class="btn btn-gray" style="padding:0.5rem 1rem; font-size:0.875rem;">Clear</button>
+        </div>
+      </div>
+
+      <!-- Data Table -->
+      <div style="background:#fff; border-radius:0.75rem; box-shadow:0 1px 3px rgba(0,0,0,0.1); overflow:hidden; margin-bottom:1.5rem;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Patient Name</th>
+              <th>Patient ID</th>
+              <th>Scan Type</th>
+              <th>Date</th>
+              <th>Risk Level</th>
+              <th>Confidence</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr data-id="PT001" data-date="2024-01-15">
+              <td style="font-weight:500; color:#111827;">John Doe</td>
+              <td>PT001</td>
+              <td>Melanoma</td>
+              <td>2024-01-15</td>
+              <td><span class="badge badge-high">High</span></td>
+              <td>92.1%</td>
+              <td><button class="btn-view" onclick="openModal(0)">View Details</button></td>
+            </tr>
+            <tr data-id="PT002" data-date="2024-01-14">
+              <td style="font-weight:500; color:#111827;">Jane Smith</td>
+              <td>PT002</td>
+              <td>Benign Keratosis</td>
+              <td>2024-01-14</td>
+              <td><span class="badge badge-low">Low</span></td>
+              <td>87.3%</td>
+              <td><button class="btn-view" onclick="openModal(1)">View Details</button></td>
+            </tr>
+            <tr data-id="PT003" data-date="2024-01-13">
+              <td style="font-weight:500; color:#111827;">Robert Johnson</td>
+              <td>PT003</td>
+              <td>Basal Cell Carcinoma</td>
+              <td>2024-01-13</td>
+              <td><span class="badge badge-moderate">Moderate</span></td>
+              <td>78.9%</td>
+              <td><button class="btn-view" onclick="openModal(2)">View Details</button></td>
+            </tr>
+            <tr data-id="PT004" data-date="2024-01-12">
+              <td style="font-weight:500; color:#111827;">Emily Davis</td>
+              <td>PT004</td>
+              <td>Dermatofibroma</td>
+              <td>2024-01-12</td>
+              <td><span class="badge badge-low">Low</span></td>
+              <td>94.2%</td>
+              <td><button class="btn-view" onclick="openModal(3)">View Details</button></td>
+            </tr>
+            <tr data-id="PT005" data-date="2024-01-11">
+              <td style="font-weight:500; color:#111827;">Michael Wilson</td>
+              <td>PT005</td>
+              <td>Actinic Keratosis</td>
+              <td>2024-01-11</td>
+              <td><span class="badge badge-moderate">Moderate</span></td>
+              <td>81.5%</td>
+              <td><button class="btn-view" onclick="openModal(4)">View Details</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Summary Stats -->
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1rem;">
+        <div class="stat-mini">
+          <p class="stat-mini-value">5</p>
+          <p class="stat-mini-label">Total Scans</p>
+        </div>
+        <div class="stat-mini">
+          <p class="stat-mini-value" style="color:#dc2626;">1</p>
+          <p class="stat-mini-label">High Risk</p>
+        </div>
+        <div class="stat-mini">
+          <p class="stat-mini-value" style="color:#16a34a;">86.8%</p>
+          <p class="stat-mini-label">Avg. Confidence</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal (hidden) -->
+  <div id="modal" class="modal-overlay hidden" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h2 id="modalTitle" style="color:#111827;">Patient Details</h2>
+        <button onclick="document.getElementById('modal').classList.add('hidden')" style="background:none; border:none; cursor:pointer; padding:0.25rem;">
+          <svg width="24" height="24" fill="none" stroke="#4b5563" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Patient Info Grid -->
+        <div class="detail-grid" id="detailGrid"></div>
+
+        <!-- Diagnosis Summary -->
+        <div style="margin-bottom:1.5rem;">
+          <h3 style="color:#111827; margin-bottom:0.75rem;">Diagnosis Summary</h3>
+          <p id="diagSummary" style="color:#374151; line-height:1.6; background:#f9fafb; border-radius:0.5rem; padding:1rem;"></p>
+        </div>
+
+        <!-- Scan Image Placeholder -->
+        <div style="margin-bottom:1.5rem;">
+          <h3 style="color:#111827; margin-bottom:0.75rem;">Scan Image</h3>
+          <div style="width:100%; height:12rem; background:#f3f4f6; border-radius:0.5rem; display:flex; align-items:center; justify-content:center; color:#9ca3af;">
+            <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          </div>
+        </div>
+
+        <!-- Medical Report Text -->
+        <div style="margin-bottom:1.5rem;">
+          <h3 style="color:#111827; margin-bottom:0.75rem;">Medical Report</h3>
+          <div id="reportText" style="color:#374151; line-height:1.6; background:#f9fafb; border-radius:0.5rem; padding:1rem; font-size:0.875rem;"></div>
+        </div>
+
+        <!-- Actions -->
+        <div style="display:flex; gap:1rem;">
+          <button onclick="window.print()" class="btn btn-indigo flex-1" style="padding:0.75rem;">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download Report
+          </button>
+          <button onclick="document.getElementById('modal').classList.add('hidden')" class="btn btn-gray flex-1" style="padding:0.75rem;">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var records = [
+      {
+        name: 'John Doe', id: 'PT001', age: '45', type: 'Melanoma', date: '2024-01-15',
+        risk: 'High', confidence: '92.1%', physician: 'Dr. Sarah Johnson',
+        summary: 'AI analysis detected possible melanoma with high confidence. The lesion shows irregular borders, asymmetric structure, and varied pigmentation. Immediate dermatological consultation is recommended for biopsy and further evaluation.',
+        report: 'The submitted lesion image demonstrates characteristics consistent with melanoma. Key indicators include asymmetric morphology, irregular border pattern, color variation across the lesion, and a diameter exceeding 6mm. The ABCDE criteria analysis flags multiple risk factors. Urgent referral to a dermatologist is strongly recommended.'
+      },
+      {
+        name: 'Jane Smith', id: 'PT002', age: '38', type: 'Benign Keratosis', date: '2024-01-14',
+        risk: 'Low', confidence: '87.3%', physician: 'Dr. Sarah Johnson',
+        summary: 'AI analysis indicates a benign keratosis classification. The lesion shows well-defined borders, uniform pigmentation, and symmetrical structure. Regular monitoring is advised.',
+        report: 'The lesion exhibits characteristics of seborrheic keratosis, a common benign skin growth. The borders are well-defined, pigmentation is uniform, and there are no signs of malignant transformation. Routine monitoring during regular dermatological check-ups is recommended.'
+      },
+      {
+        name: 'Robert Johnson', id: 'PT003', age: '62', type: 'Basal Cell Carcinoma', date: '2024-01-13',
+        risk: 'Moderate', confidence: '78.9%', physician: 'Dr. Sarah Johnson',
+        summary: 'AI analysis suggests possible basal cell carcinoma with moderate confidence. The lesion shows pearly translucent borders and telangiectasia. Dermatological evaluation recommended.',
+        report: 'The image analysis reveals features suggestive of basal cell carcinoma, including pearly rolled borders and visible blood vessels (telangiectasia). While BCC is typically slow-growing and rarely metastasizes, dermatological evaluation and possible biopsy are recommended to confirm the diagnosis and determine appropriate treatment.'
+      },
+      {
+        name: 'Emily Davis', id: 'PT004', age: '29', type: 'Dermatofibroma', date: '2024-01-12',
+        risk: 'Low', confidence: '94.2%', physician: 'Dr. Sarah Johnson',
+        summary: 'AI analysis identifies the lesion as a dermatofibroma with high confidence. This is a benign fibrous nodule commonly found on lower extremities. No treatment necessary unless symptomatic.',
+        report: 'The submitted image is consistent with a dermatofibroma, a benign fibrous histiocytoma. The lesion shows the characteristic firm, dome-shaped nodule with positive dimple sign potential. No treatment is required unless the patient experiences discomfort or desires cosmetic removal.'
+      },
+      {
+        name: 'Michael Wilson', id: 'PT005', age: '55', type: 'Actinic Keratosis', date: '2024-01-11',
+        risk: 'Moderate', confidence: '81.5%', physician: 'Dr. Sarah Johnson',
+        summary: 'AI analysis indicates actinic keratosis with moderate confidence. The lesion shows rough, scaly patches typical of sun-damaged skin. Treatment recommended to prevent potential progression.',
+        report: 'The lesion exhibits features consistent with actinic keratosis, a precancerous condition caused by cumulative sun exposure. The rough, scaly patch is located on a sun-exposed area. Treatment options include cryotherapy, topical medications, or photodynamic therapy. Regular monitoring is essential as untreated actinic keratoses can progress to squamous cell carcinoma.'
+      }
+    ];
+
+    // Filter logic
+    var dateFilter = document.getElementById('dateFilter');
+    var patientFilter = document.getElementById('patientFilter');
+    var clearBtn = document.getElementById('clearBtn');
+    var rows = document.querySelectorAll('#tableBody tr');
+
+    function applyFilters() {
+      var dateVal = dateFilter.value;
+      var patientVal = patientFilter.value.toLowerCase().trim();
+      rows.forEach(function(row) {
+        var matchDate = !dateVal || row.getAttribute('data-date') === dateVal;
+        var matchPatient = !patientVal || row.getAttribute('data-id').toLowerCase().includes(patientVal);
+        row.style.display = (matchDate && matchPatient) ? '' : 'none';
+      });
+    }
+
+    dateFilter.addEventListener('change', applyFilters);
+    patientFilter.addEventListener('input', applyFilters);
+    clearBtn.addEventListener('click', function() {
+      dateFilter.value = '';
+      patientFilter.value = '';
+      rows.forEach(function(row) { row.style.display = ''; });
+    });
+
+    // Modal
+    function openModal(index) {
+      var r = records[index];
+      document.getElementById('modalTitle').textContent = r.name + ' — ' + r.type;
+      document.getElementById('detailGrid').innerHTML =
+        '<div class="detail-item"><span class="detail-label">Patient ID</span><span class="detail-value">' + r.id + '</span></div>' +
+        '<div class="detail-item"><span class="detail-label">Name</span><span class="detail-value">' + r.name + '</span></div>' +
+        '<div class="detail-item"><span class="detail-label">Age</span><span class="detail-value">' + r.age + ' years</span></div>' +
+        '<div class="detail-item"><span class="detail-label">Scan Type</span><span class="detail-value">' + r.type + '</span></div>' +
+        '<div class="detail-item"><span class="detail-label">Date</span><span class="detail-value">' + r.date + '</span></div>' +
+        '<div class="detail-item"><span class="detail-label">Risk</span><span class="detail-value">' + r.risk + '</span></div>' +
+        '<div class="detail-item"><span class="detail-label">Confidence</span><span class="detail-value">' + r.confidence + '</span></div>' +
+        '<div class="detail-item"><span class="detail-label">Physician</span><span class="detail-value">' + r.physician + '</span></div>';
+      document.getElementById('diagSummary').textContent = r.summary;
+      document.getElementById('reportText').textContent = r.report;
+      document.getElementById('modal').classList.remove('hidden');
+    }
+
+    function closeModal(e) {
+      if (e.target === document.getElementById('modal')) {
+        document.getElementById('modal').classList.add('hidden');
+      }
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') document.getElementById('modal').classList.add('hidden');
+    });
+  </script>
+</body>
+</html>

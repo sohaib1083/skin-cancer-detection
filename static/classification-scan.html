@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Classification Scan - SkinScan AI</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .image-preview { position: relative; }
+    .image-preview img { width: 100%; max-height: 24rem; object-fit: contain; border-radius: 0.5rem; }
+    .remove-btn { position: absolute; top: 1rem; right: 1rem; background: #ef4444; color: #fff; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; border: none; }
+    .remove-btn:hover { background: #dc2626; }
+    .analysis-result { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 0.5rem; padding: 1.5rem; }
+    .result-row { display: flex; justify-content: space-between; padding: 0.5rem 0; }
+  </style>
+</head>
+<body>
+  <div class="page-with-sidebar" style="background:#f9fafb;">
+    <!-- Sidebar -->
+    <aside class="sidebar" style="box-shadow:0 10px 15px rgba(0,0,0,0.1);">
+      <div class="sidebar-header" style="border-bottom:1px solid #e5e7eb;">
+        <h2 style="color:#4f46e5;">Skin Scan AI</h2>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="sidebar-nav-item">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </a>
+        <div class="sidebar-section-title">Classification Types</div>
+        <a href="classification-scan.html?type=melanoma" class="sidebar-nav-item" data-type="melanoma"><span class="nav-emoji">1️⃣</span><span class="nav-text-sm">Melanoma</span></a>
+        <a href="classification-scan.html?type=basal-cell" class="sidebar-nav-item" data-type="basal-cell"><span class="nav-emoji">2️⃣</span><span class="nav-text-sm">Basal Cell Carcinoma (BCC)</span></a>
+        <a href="classification-scan.html?type=squamous-cell" class="sidebar-nav-item" data-type="squamous-cell"><span class="nav-emoji">3️⃣</span><span class="nav-text-sm">Squamous Cell Carcinoma (SCC)</span></a>
+        <a href="classification-scan.html?type=actinic-keratosis" class="sidebar-nav-item" data-type="actinic-keratosis"><span class="nav-emoji">4️⃣</span><span class="nav-text-sm">Actinic Keratosis</span></a>
+        <a href="classification-scan.html?type=benign-keratosis" class="sidebar-nav-item" data-type="benign-keratosis"><span class="nav-emoji">5️⃣</span><span class="nav-text-sm">Benign Keratosis</span></a>
+        <a href="classification-scan.html?type=dermatofibroma" class="sidebar-nav-item" data-type="dermatofibroma"><span class="nav-emoji">6️⃣</span><span class="nav-text-sm">Dermatofibroma</span></a>
+        <a href="classification-scan.html?type=vascular-lesions" class="sidebar-nav-item" data-type="vascular-lesions"><span class="nav-emoji">7️⃣</span><span class="nav-text-sm">Vascular Lesions</span></a>
+        <div style="padding-top:1rem;">
+          <a href="patient-history.html" class="sidebar-nav-item">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            History
+          </a>
+        </div>
+        <a href="login.html" class="sidebar-nav-item danger">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Logout
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main style="flex:1; padding:2rem;">
+      <a href="dashboard.html" class="back-btn">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Back to Dashboard
+      </a>
+
+      <div style="max-width:56rem; margin:0 auto;">
+        <!-- Header -->
+        <div style="text-align:center; margin-bottom:2rem;">
+          <div id="headerIcon" style="width:5rem; height:5rem; border-radius:9999px; display:flex; align-items:center; justify-content:center; margin:0 auto 1rem; color:#fff; font-size:1.875rem;"></div>
+          <h1 id="pageTitle" style="color:#111827; margin-bottom:0.5rem;"></h1>
+          <p style="color:#4b5563;">Upload or capture an image for AI analysis</p>
+        </div>
+
+        <!-- Upload Section -->
+        <div style="background:#fff; border-radius:0.75rem; box-shadow:0 10px 15px rgba(0,0,0,0.1); padding:2rem;">
+          <div id="uploadSection">
+            <!-- Upload from Device -->
+            <div class="upload-area" style="margin-bottom:1.5rem; padding:3rem;" onclick="document.getElementById('fileInput').click()">
+              <svg width="64" height="64" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" style="margin:0 auto 1rem;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <h3 style="color:#111827; margin-bottom:0.5rem;">Upload Image from Device</h3>
+              <p style="color:#4b5563;">Click to browse files</p>
+              <input id="fileInput" type="file" accept="image/*" style="display:none;" onchange="handleFileSelect(event)">
+            </div>
+
+            <!-- Capture -->
+            <div class="upload-area" style="padding:3rem;" onclick="handleCapture()">
+              <svg width="64" height="64" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" style="margin:0 auto 1rem;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              <h3 style="color:#111827; margin-bottom:0.5rem;">📷 Capture Live Image</h3>
+              <p style="color:#4b5563;">Use your device camera</p>
+            </div>
+          </div>
+
+          <div id="previewSection" style="display:none;">
+            <div class="image-preview">
+              <img id="previewImage" src="" alt="Selected scan">
+              <button class="remove-btn" onclick="removeImage()">Remove</button>
+            </div>
+
+            <!-- Analyze Button -->
+            <div id="analyzeSection" style="margin-top:1.5rem;">
+              <button id="analyzeBtn" onclick="handleAnalyze()" class="btn btn-indigo w-full" style="padding:1rem;">
+                🔹 Analyze Image
+              </button>
+            </div>
+
+            <!-- Results -->
+            <div id="resultsSection" style="display:none; margin-top:1.5rem;">
+              <div class="analysis-result">
+                <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1rem;">
+                  <svg width="32" height="32" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                  <div>
+                    <h3 style="color:#14532d;">Analysis Complete</h3>
+                    <p style="color:#15803d;">Results are ready for review</p>
+                  </div>
+                </div>
+                <div style="background:#fff; border-radius:0.5rem; padding:1rem;">
+                  <div class="result-row"><span style="color:#374151;">Classification:</span><span id="resultClassification" style="color:#111827; font-weight:600;"></span></div>
+                  <div class="result-row"><span style="color:#374151;">Confidence:</span><span id="resultConfidence" style="color:#111827; font-weight:600;"></span></div>
+                  <div class="result-row"><span style="color:#374151;">Risk Level:</span><span id="resultRisk" style="font-weight:600;"></span></div>
+                </div>
+                <div id="preventionStepsSection" style="margin-top:1rem; background:#f9fafb; border-radius:0.5rem; padding:1rem; display:none;">
+                  <h4 style="color:#374151; margin-bottom:0.5rem;">Prevention & Recommendations</h4>
+                  <p id="resultPreventionSteps" style="color:#4b5563; font-size:0.875rem; white-space:pre-line;"></p>
+                </div>
+                <button onclick="window.location.href='diagnosis-result.html'" class="btn btn-indigo w-full" style="margin-top:1rem; padding:0.75rem;">
+                  View Full Report
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const types = {
+      'melanoma': { name: 'Melanoma', emoji: '1️⃣', color: 'linear-gradient(135deg,#ef4444,#dc2626)' },
+      'basal-cell': { name: 'Basal Cell Carcinoma (BCC)', emoji: '2️⃣', color: 'linear-gradient(135deg,#f97316,#ea580c)' },
+      'squamous-cell': { name: 'Squamous Cell Carcinoma (SCC)', emoji: '3️⃣', color: 'linear-gradient(135deg,#eab308,#ca8a04)' },
+      'actinic-keratosis': { name: 'Actinic Keratosis', emoji: '4️⃣', color: 'linear-gradient(135deg,#22c55e,#16a34a)' },
+      'benign-keratosis': { name: 'Benign Keratosis', emoji: '5️⃣', color: 'linear-gradient(135deg,#3b82f6,#2563eb)' },
+      'dermatofibroma': { name: 'Dermatofibroma', emoji: '6️⃣', color: 'linear-gradient(135deg,#6366f1,#4f46e5)' },
+      'vascular-lesions': { name: 'Vascular Lesions', emoji: '7️⃣', color: 'linear-gradient(135deg,#a855f7,#7c3aed)' }
+    };
+
+    const params = new URLSearchParams(window.location.search);
+    const type = params.get('type') || 'melanoma';
+    const currentType = types[type] || types['melanoma'];
+
+    document.getElementById('headerIcon').style.background = currentType.color;
+    document.getElementById('headerIcon').textContent = currentType.emoji;
+    document.getElementById('pageTitle').textContent = currentType.name;
+    document.title = currentType.name + ' - SkinScan AI';
+
+    // Highlight active sidebar item
+    document.querySelectorAll('.sidebar-nav-item[data-type]').forEach(function(el) {
+      if (el.getAttribute('data-type') === type) {
+        el.classList.add('active');
+      }
+    });
+
+    let selectedFile = null;
+
+    function handleFileSelect(e) {
+      const file = e.target.files[0];
+      if (file) {
+        selectedFile = file;
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+          document.getElementById('previewImage').src = ev.target.result;
+          document.getElementById('uploadSection').style.display = 'none';
+          document.getElementById('previewSection').style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function handleCapture() {
+      alert('Camera feature would be implemented here using navigator.mediaDevices.getUserMedia()');
+    }
+
+    function removeImage() {
+      selectedFile = null;
+      document.getElementById('uploadSection').style.display = 'block';
+      document.getElementById('previewSection').style.display = 'none';
+      document.getElementById('analyzeSection').style.display = 'block';
+      document.getElementById('resultsSection').style.display = 'none';
+      document.getElementById('fileInput').value = '';
+    }
+
+    async function handleAnalyze() {
+      if (!selectedFile) return;
+      var btn = document.getElementById('analyzeBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner" style="width:1.5rem;height:1.5rem;border-width:2px;margin:0 0.5rem 0 0;"></span> Analyzing Image...';
+
+      try {
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+        const response = await fetch('http://localhost:8000/predict', {
+          method: 'POST',
+          body: formData
+        });
+        if (!response.ok) throw new Error('Server error: ' + response.status);
+        const data = await response.json();
+
+        // Save to localStorage for full report page
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+          localStorage.setItem('scanImagePreview', ev.target.result);
+          localStorage.setItem('patientId', 'N/A');
+          localStorage.setItem('patientName', 'N/A');
+          localStorage.setItem('patientAge', 'N/A');
+          localStorage.setItem('scanDate', new Date().toLocaleDateString());
+          localStorage.setItem('isEmergency', 'false');
+          localStorage.setItem('scanResult', JSON.stringify(data));
+        };
+        reader.readAsDataURL(selectedFile);
+
+        // Display inline results
+        const riskColors = { 'High': '#dc2626', 'Moderate': '#ea580c', 'Low': '#16a34a' };
+        document.getElementById('resultClassification').textContent = data.class_name;
+        document.getElementById('resultConfidence').textContent = data.confidence + '%';
+        document.getElementById('resultRisk').textContent = data.risk_level;
+        document.getElementById('resultRisk').style.color = riskColors[data.risk_level] || '#374151';
+        document.getElementById('resultPreventionSteps').textContent = data.prevention_steps;
+        document.getElementById('preventionStepsSection').style.display = 'block';
+
+        document.getElementById('analyzeSection').style.display = 'none';
+        document.getElementById('resultsSection').style.display = 'block';
+      } catch (err) {
+        btn.disabled = false;
+        btn.innerHTML = '🔹 Analyze Image';
+        alert('Error: ' + err.message + '\nMake sure the backend server is running.');
+      }
+    }
+  </script>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Medical Report - SkinScan AI</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .report-container { max-width:56rem; margin:0 auto; }
+    .report-header { background:linear-gradient(135deg,#4f46e5,#7c3aed); border-radius:1rem 1rem 0 0; padding:2.5rem; color:#fff; text-align:center; }
+    .report-body { background:#fff; border-radius:0 0 1rem 1rem; box-shadow:0 10px 15px rgba(0,0,0,0.1); padding:2.5rem; }
+    .report-row { display:grid; grid-template-columns:1fr 1fr; gap:2rem; margin-bottom:2rem; }
+    .report-section { margin-bottom:2rem; }
+    .report-section h3 { color:#111827; margin-bottom:1rem; padding-bottom:0.5rem; border-bottom:2px solid #e5e7eb; }
+    .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; }
+    .info-item { display:flex; flex-direction:column; gap:0.25rem; }
+    .info-label { color:#4b5563; font-size:0.875rem; }
+    .info-value { color:#111827; font-weight:500; }
+    .summary-box { background:#eef2ff; border-left:4px solid #4f46e5; border-radius:0.5rem; padding:1.25rem; margin-bottom:2rem; }
+    .findings-list { list-style:none; padding:0; display:flex; flex-direction:column; gap:0.5rem; }
+    .findings-list li { display:flex; align-items:flex-start; gap:0.5rem; color:#374151; line-height:1.5; }
+    .findings-list li::before { content:"•"; color:#4f46e5; font-weight:bold; }
+    .risk-section { padding:1.25rem; border-radius:0.75rem; margin-bottom:2rem; }
+    .risk-low-bg { background:#f0fdf4; border:1px solid #86efac; }
+    .risk-moderate-bg { background:#fff7ed; border:1px solid #fed7aa; }
+    .risk-high-bg { background:#fef2f2; border:1px solid #fecaca; }
+    .recommendations-list { list-style:none; padding:0; counter-reset:rec; display:flex; flex-direction:column; gap:0.75rem; }
+    .recommendations-list li { counter-increment:rec; display:flex; gap:0.75rem; color:#374151; line-height:1.5; }
+    .recommendations-list li::before { content:counter(rec); display:flex; align-items:center; justify-content:center; min-width:1.75rem; height:1.75rem; background:#eef2ff; color:#4f46e5; border-radius:9999px; font-weight:600; font-size:0.875rem; }
+    .disclaimer-box { background:#fefce8; border:1px solid #fde047; border-radius:0.75rem; padding:1.25rem; margin-bottom:2rem; }
+    .reference-image-box { background:#f9fafb; border-radius:0.75rem; padding:1.5rem; display:flex; align-items:center; gap:1.5rem; margin-bottom:2rem; }
+    @media (max-width:768px) { .report-row, .info-grid { grid-template-columns:1fr; } }
+    @media print { .no-print { display:none; } }
+  </style>
+</head>
+<body>
+  <div class="page-with-sidebar gradient-bg-gray-indigo">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header-gradient">
+        <div style="display:flex; align-items:center; gap:0.75rem;">
+          <div style="width:2.5rem; height:2.5rem; background:#fff; border-radius:0.75rem; display:flex; align-items:center; justify-content:center;">
+            <svg width="24" height="24" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <h2 style="color:#fff; font-size:1.125rem;">SkinScan AI</h2>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="sidebar-nav-item">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </a>
+        <div class="sidebar-section-title">Classification Types</div>
+        <a href="classification-scan.html?type=melanoma" class="sidebar-nav-item"><span class="nav-emoji">1️⃣</span><span class="nav-text-sm">Melanoma</span></a>
+        <a href="classification-scan.html?type=basal-cell" class="sidebar-nav-item"><span class="nav-emoji">2️⃣</span><span class="nav-text-sm">Basal Cell Carcinoma (BCC)</span></a>
+        <a href="classification-scan.html?type=squamous-cell" class="sidebar-nav-item"><span class="nav-emoji">3️⃣</span><span class="nav-text-sm">Squamous Cell Carcinoma (SCC)</span></a>
+        <a href="classification-scan.html?type=actinic-keratosis" class="sidebar-nav-item"><span class="nav-emoji">4️⃣</span><span class="nav-text-sm">Actinic Keratosis</span></a>
+        <a href="classification-scan.html?type=benign-keratosis" class="sidebar-nav-item"><span class="nav-emoji">5️⃣</span><span class="nav-text-sm">Benign Keratosis</span></a>
+        <a href="classification-scan.html?type=dermatofibroma" class="sidebar-nav-item"><span class="nav-emoji">6️⃣</span><span class="nav-text-sm">Dermatofibroma</span></a>
+        <a href="classification-scan.html?type=vascular-lesions" class="sidebar-nav-item"><span class="nav-emoji">7️⃣</span><span class="nav-text-sm">Vascular Lesions</span></a>
+        <div style="padding-top:1rem;">
+          <a href="patient-history.html" class="sidebar-nav-item">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            History
+          </a>
+        </div>
+        <a href="login.html" class="sidebar-nav-item danger">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Logout
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main style="flex:1; padding:2rem; overflow-y:auto;">
+      <div class="no-print" style="margin-bottom:1.5rem;">
+        <a href="javascript:history.back()" class="back-btn">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          Back to Results
+        </a>
+      </div>
+
+      <div class="report-container">
+        <!-- Report Header -->
+        <div class="report-header">
+          <div style="display:flex; align-items:center; justify-content:center; gap:0.75rem; margin-bottom:0.5rem;">
+            <svg width="32" height="32" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <h1 style="font-size:1.5rem; font-weight:700;">Medical Diagnostic Report</h1>
+          </div>
+          <p style="color:rgba(255,255,255,0.8);">SkinScan AI — Automated Skin Lesion Analysis</p>
+          <p id="reportDate" style="color:rgba(255,255,255,0.7); font-size:0.875rem; margin-top:0.5rem;"></p>
+        </div>
+
+        <!-- Report Body -->
+        <div class="report-body">
+          <!-- Patient & Scan Info -->
+          <div class="report-row">
+            <div class="report-section">
+              <h3>Patient Information</h3>
+              <div class="info-grid">
+                <div class="info-item"><span class="info-label">Patient ID</span><span class="info-value">PT123456</span></div>
+                <div class="info-item"><span class="info-label">Name</span><span class="info-value">John Doe</span></div>
+                <div class="info-item"><span class="info-label">Age</span><span class="info-value">45 years</span></div>
+                <div class="info-item"><span class="info-label">Gender</span><span class="info-value">Male</span></div>
+              </div>
+            </div>
+            <div class="report-section">
+              <h3>Scan Information</h3>
+              <div class="info-grid">
+                <div class="info-item"><span class="info-label">Scan Type</span><span class="info-value">Benign Keratosis</span></div>
+                <div class="info-item"><span class="info-label">Scan Date</span><span id="scanDate" class="info-value"></span></div>
+                <div class="info-item"><span class="info-label">Report ID</span><span class="info-value">RPT-2024-0847</span></div>
+                <div class="info-item"><span class="info-label">Physician</span><span class="info-value">Dr. Sarah Johnson</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- AI Summary -->
+          <div class="summary-box">
+            <h3 style="color:#4f46e5; margin-bottom:0.5rem; font-size:1rem;">AI Analysis Summary</h3>
+            <p style="color:#374151; line-height:1.6;">The AI analysis of the submitted skin lesion image indicates a <strong>Benign Keratosis</strong> classification with <strong>87.3%</strong> confidence. The lesion demonstrates well-defined borders, uniform pigmentation, and symmetrical structure consistent with benign characteristics. No indicators of malignancy were detected in the current analysis.</p>
+          </div>
+
+          <!-- Clinical Findings -->
+          <div class="report-section">
+            <h3>Clinical Findings</h3>
+            <ul class="findings-list">
+              <li>Well-defined and regular border margins observed</li>
+              <li>Uniform pigmentation pattern throughout the lesion</li>
+              <li>Symmetrical lesion structure with no irregularities</li>
+              <li>No evidence of rapid growth or ulceration</li>
+              <li>Lesion size within normal parameters for benign classification</li>
+              <li>No satellite lesions detected in surrounding area</li>
+            </ul>
+          </div>
+
+          <!-- Risk Assessment -->
+          <div class="report-section">
+            <h3>Risk Assessment</h3>
+            <div class="risk-section risk-low-bg">
+              <div style="display:flex; align-items:center; justify-content:space-between;">
+                <div>
+                  <p style="color:#166534; font-weight:600; font-size:1.125rem;">Low Risk</p>
+                  <p style="color:#15803d; font-size:0.875rem;">Based on AI analysis and clinical indicators</p>
+                </div>
+                <span style="background:#dcfce7; color:#166534; padding:0.5rem 1rem; border-radius:9999px; font-weight:600;">87.3% Confidence</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recommendations -->
+          <div class="report-section">
+            <h3>Recommendations</h3>
+            <ol class="recommendations-list">
+              <li>Regular monitoring of the lesion every 6 months is advised</li>
+              <li>Document any changes in size, shape, or color</li>
+              <li>Apply broad-spectrum SPF 50+ sunscreen to the area when exposed to sunlight</li>
+              <li>Consult a dermatologist if the lesion exhibits rapid changes</li>
+              <li>Consider dermatoscopic follow-up at the next routine visit</li>
+            </ol>
+          </div>
+
+          <!-- Disclaimer -->
+          <div class="disclaimer-box">
+            <div style="display:flex; align-items:flex-start; gap:0.75rem;">
+              <svg width="24" height="24" fill="none" stroke="#ca8a04" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" style="min-width:24px;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              <div>
+                <p style="color:#854d0e; font-weight:600; margin-bottom:0.25rem;">Important Disclaimer</p>
+                <p style="color:#713f12; font-size:0.875rem; line-height:1.5;">This report is generated by an AI system and is intended to assist medical professionals in their diagnostic process. It should not be used as a sole basis for clinical decisions. Always correlate with clinical findings and patient history. A qualified dermatologist should review and confirm the findings.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Reference Image -->
+          <div class="report-section">
+            <h3>Reference Image</h3>
+            <div class="reference-image-box">
+              <div style="width:10rem; height:10rem; background:#e5e7eb; border-radius:0.5rem; display:flex; align-items:center; justify-content:center; color:#9ca3af;">
+                <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              </div>
+              <div>
+                <p style="color:#111827; font-weight:500; margin-bottom:0.25rem;">Submitted Lesion Image</p>
+                <p style="color:#4b5563; font-size:0.875rem;">Captured during scan session on <span id="captureDate"></span></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="no-print" style="display:flex; gap:1rem; padding-top:1rem; border-top:1px solid #e5e7eb;">
+            <button onclick="window.print()" class="btn btn-indigo flex-1" style="padding:1rem; display:flex; align-items:center; justify-content:center; gap:0.5rem;">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download PDF
+            </button>
+            <a href="patient-history.html" class="btn btn-green flex-1" style="padding:1rem; text-align:center; display:flex; align-items:center; justify-content:center; gap:0.5rem;">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              Save to History
+            </a>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    var now = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+    document.getElementById('reportDate').textContent = 'Generated on ' + now;
+    document.getElementById('scanDate').textContent = now;
+    document.getElementById('captureDate').textContent = now;
+  </script>
+</body>
+</html>

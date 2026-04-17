@@ -1,10 +1,12 @@
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 import torch
+import torch.nn.functional as F
 from transformers import ViTForImageClassification, ViTImageProcessor
 from PIL import Image
-import requests
 import io
 import os
 from dotenv import load_dotenv
@@ -16,11 +18,15 @@ load_dotenv()
 # Define a Pydantic model for the response
 class PredictionResponse(BaseModel):
     class_name: str
+    label: str
+    confidence: float
+    risk_level: str
+    is_malignant: bool
     prevention_steps: str
 
 # Load your trained VIT model from transformers
 model = ViTForImageClassification.from_pretrained("google/vit-base-patch16-224", num_labels=7, ignore_mismatched_sizes=True)
-model.load_state_dict(torch.load("./models/vit_skin_cancer.pth"))
+model.load_state_dict(torch.load("./models/vit_skin_cancer.pth", map_location=torch.device('cpu')))
 model.eval()
 
 # Load the image processor
@@ -41,6 +47,21 @@ app.add_middleware(
 # Initialize Groq client
 groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
+# Risk level and malignancy mapping
+RISK_MAP = {
+    'mel':   ('High',     True),
+    'bcc':   ('High',     True),
+    'akiec': ('Moderate', False),
+    'vasc':  ('Moderate', False),
+    'nv':    ('Low',      False),
+    'bkl':   ('Low',      False),
+    'df':    ('Low',      False),
+}
+
+@app.get("/")
+async def root():
+    return RedirectResponse(url="/static/index.html")
+
 @app.post("/predict", response_model=PredictionResponse)
 async def predict_image(file: UploadFile = File(...)):
     # Read the uploaded image
@@ -54,8 +75,9 @@ async def predict_image(file: UploadFile = File(...)):
     with torch.no_grad():
         outputs = model(**inputs)
         logits = outputs.logits
-        predicted_class = logits.argmax(-1).item()
-    
+        probs = F.softmax(logits, dim=-1)
+        predicted_class = probs.argmax(-1).item()
+        confidence = float(probs[0, predicted_class].item()) * 100
 
     classes = ['bkl', 'bcc', 'akiec', 'vasc', 'nv', 'mel', 'df']
     class_names = {
@@ -69,6 +91,7 @@ async def predict_image(file: UploadFile = File(...)):
     }
     predicted_label = classes[predicted_class]
     class_name = class_names[predicted_label]
+    risk_level, is_malignant = RISK_MAP[predicted_label]
     
     # Get prevention steps from Groq LLM
     try:
@@ -91,4 +114,14 @@ async def predict_image(file: UploadFile = File(...)):
     except Exception as e:
         prevention_steps = f"Unable to fetch prevention steps at this time. Please consult a dermatologist for personalized advice. Error: {str(e)}"
     
-    return PredictionResponse(class_name=class_name, prevention_steps=prevention_steps)
+    return PredictionResponse(
+        class_name=class_name,
+        label=predicted_label,
+        confidence=round(confidence, 1),
+        risk_level=risk_level,
+        is_malignant=is_malignant,
+        prevention_steps=prevention_steps
+    )
+
+# Serve static website files
+app.mount("/static", StaticFiles(directory="static", html=True), name="static")
